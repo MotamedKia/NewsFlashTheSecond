@@ -106,29 +106,6 @@ class MainActivity : ComponentActivity() {
                         }
                     })
                 }) { innerPadding ->
-                    Column(
-                        Modifier
-                            .fillMaxSize()
-                            .padding(end = 20.dp, top = 100.dp),
-                        verticalArrangement = Arrangement.Top,
-                        horizontalAlignment = Alignment.End
-                    ) {
-                        Card(
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.primary,
-                                contentColor = MaterialTheme.colorScheme.onPrimary
-                            )
-                        ) {
-                            Column {
-                                IconButton(onClick = { currentScreen = Screen.HOME }) {
-                                    Icon(Icons.Default.Home, "Home")
-                                }
-                                IconButton(onClick = { currentScreen = Screen.SETTINGS }) {
-                                    Icon(Icons.Default.Settings, "Settings")
-                                }
-                            }
-                        }
-                    }
                     when (currentScreen) {
                         Screen.SETTINGS -> Settings(
                             Modifier.padding(innerPadding),
@@ -144,7 +121,33 @@ class MainActivity : ComponentActivity() {
 
                         Screen.HOME -> Home(modifier = Modifier.padding(innerPadding))
                     }
-
+                    Column(
+                        Modifier
+                            .fillMaxSize()
+                            .padding(end = 25.dp, bottom = 30.dp),
+                        verticalArrangement = Arrangement.Bottom,
+                        horizontalAlignment = Alignment.End
+                    ) {
+                        Card(
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
+                        ) {
+                            Column {
+                                IconButton(onClick = { currentScreen = Screen.HOME }) {
+                                    Icon(
+                                        Icons.Default.Home,
+                                        "Home",
+                                        tint = if (currentScreen == Screen.HOME) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.onPrimary
+                                    )
+                                }
+                                IconButton(onClick = { currentScreen = Screen.SETTINGS }) {
+                                    Icon(
+                                        Icons.Default.Settings, "Settings",
+                                        tint = if (currentScreen == Screen.SETTINGS) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.onPrimary
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
