@@ -119,7 +119,10 @@ class MainActivity : ComponentActivity() {
                             if (isAlienLang) FontFamily(Font(R.font.allymade)) else FontFamily.Default
                         )
 
-                        Screen.HOME -> Home(modifier = Modifier.padding(innerPadding))
+                        Screen.HOME -> Home(
+                            modifier = Modifier.padding(innerPadding),
+                            if (isAlienLang) FontFamily(Font(R.font.allymade)) else FontFamily.Default
+                        )
                     }
                     Column(
                         Modifier
