@@ -1,33 +1,26 @@
 package com.example.newsflashthesecond
 
-import android.graphics.drawable.Icon
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,11 +35,11 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.example.newsflashthesecond.preferences.LanguagePreferences
 import com.example.newsflashthesecond.preferences.ThemePreferences
+import com.example.newsflashthesecond.retrofit.NewsResponse
+import com.example.newsflashthesecond.retrofit.loadArticle
 import com.example.newsflashthesecond.screens.Home
 import com.example.newsflashthesecond.screens.Settings
 import com.example.newsflashthesecond.ui.theme.NewsFlashTheSecondTheme
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 private enum class Screen {
     HOME,
@@ -60,6 +53,11 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val context = LocalContext.current
+
+            var isLoading by remember { mutableStateOf(false) }
+            var errorMessage by remember { mutableStateOf<String?>(null) }
+            var newsResponse by remember { mutableStateOf<List<NewsResponse>>(emptyList()) }
+
             var currentScreen by remember { mutableStateOf(Screen.HOME) }
             var currentTitle by remember { mutableStateOf("News Flash Jr") }
             when (currentScreen) {
@@ -77,6 +75,16 @@ class MainActivity : ComponentActivity() {
             LaunchedEffect(Unit) {
                 isDarkTheme = themePreferences.isDarkThemeEnabled()
                 isAlienLang = languagePreferences.isAlienLanguageEnabled()
+
+                isLoading = true
+                errorMessage = null
+                try {
+                    newsResponse = loadArticle()
+                } catch (e: Exception) {
+                    errorMessage = e.message ?: "Unknown error"
+                } finally {
+                    isLoading = false
+                }
             }
 
             NewsFlashTheSecondTheme(darkTheme = isDarkTheme) {
@@ -121,7 +129,10 @@ class MainActivity : ComponentActivity() {
 
                         Screen.HOME -> Home(
                             modifier = Modifier.padding(innerPadding),
-                            if (isAlienLang) FontFamily(Font(R.font.allymade)) else FontFamily.Default
+                            if (isAlienLang) FontFamily(Font(R.font.allymade)) else FontFamily.Default,
+                            isLoading,
+                            errorMessage,
+                            newsResponse
                         )
                     }
                     Column(
