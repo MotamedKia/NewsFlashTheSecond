@@ -11,7 +11,7 @@ interface ApiService {
         @Query("pageSize") pageSize: Int = 20,
         @Query("page") page: Int = 1,
         @Query("apiKey") apiKey: String,
-    ): List<NewsResponse>
+    ): NewsResponse
 
 
     // Search everything endpoint
@@ -22,5 +22,5 @@ interface ApiService {
         @Query("pageSize") pageSize: Int = 20,
         @Query("page") page: Int = 1,
         @Query("apiKey") apiKey: String,
-    ): List<NewsResponse>
+    ): NewsResponse
 }

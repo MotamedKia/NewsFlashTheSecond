@@ -35,6 +35,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.example.newsflashthesecond.preferences.LanguagePreferences
 import com.example.newsflashthesecond.preferences.ThemePreferences
+import com.example.newsflashthesecond.retrofit.Article
 import com.example.newsflashthesecond.retrofit.NewsResponse
 import com.example.newsflashthesecond.retrofit.loadArticle
 import com.example.newsflashthesecond.screens.Home
@@ -56,7 +57,7 @@ class MainActivity : ComponentActivity() {
 
             var isLoading by remember { mutableStateOf(false) }
             var errorMessage by remember { mutableStateOf<String?>(null) }
-            var newsResponse by remember { mutableStateOf<List<NewsResponse>>(emptyList()) }
+            var newsResponse by remember { mutableStateOf<List<Article>>(emptyList()) }
 
             var currentScreen by remember { mutableStateOf(Screen.HOME) }
             var currentTitle by remember { mutableStateOf("News Flash Jr") }

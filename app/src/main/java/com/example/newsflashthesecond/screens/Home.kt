@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,7 +26,7 @@ fun Home(
     customFont: FontFamily,
     isloading: Boolean,
     errorMessage: String? = null,
-    newsResponse: List<NewsResponse>,
+    newsResponse: List<Article>,
 ) {
     Column(
         Modifier
@@ -44,11 +45,10 @@ fun Home(
             }
         } else {
             LazyColumn {
-                items(newsResponse) {
-                    it.articles.forEach { article ->
-                        Text(article.title.toString())
-                        Spacer(modifier.height(18.dp))
-                    }
+                items(newsResponse) { article ->
+                    Text(article.title ?: "No title", fontFamily = customFont)
+                    Spacer(modifier = Modifier.height(18.dp))
+                    HorizontalDivider()
                 }
             }
         }
