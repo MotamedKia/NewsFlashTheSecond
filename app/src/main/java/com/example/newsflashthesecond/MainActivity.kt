@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
@@ -36,15 +37,16 @@ import androidx.compose.ui.unit.dp
 import com.example.newsflashthesecond.preferences.LanguagePreferences
 import com.example.newsflashthesecond.preferences.ThemePreferences
 import com.example.newsflashthesecond.retrofit.Article
-import com.example.newsflashthesecond.retrofit.NewsResponse
 import com.example.newsflashthesecond.retrofit.loadArticle
+import com.example.newsflashthesecond.screens.FullItem
 import com.example.newsflashthesecond.screens.Home
 import com.example.newsflashthesecond.screens.Settings
 import com.example.newsflashthesecond.ui.theme.NewsFlashTheSecondTheme
 
 private enum class Screen {
     HOME,
-    SETTINGS
+    SETTINGS,
+    FULL_ITEM
 }
 
 class MainActivity : ComponentActivity() {
@@ -61,10 +63,12 @@ class MainActivity : ComponentActivity() {
 
             var currentScreen by remember { mutableStateOf(Screen.HOME) }
             var currentTitle by remember { mutableStateOf("News Flash Jr") }
-            when (currentScreen) {
-                Screen.SETTINGS -> currentTitle = "Settings"
-                Screen.HOME -> currentTitle = "Home"
+            currentTitle = when (currentScreen) {
+                Screen.SETTINGS -> "Settings"
+                Screen.HOME -> "Home"
+                Screen.FULL_ITEM -> "FullItem"
             }
+            var selectedArticle by remember { mutableStateOf<Article?>(null) }
 
             val coroutineScope = rememberCoroutineScope()
             val themePreferences = remember { ThemePreferences(applicationContext) }
@@ -72,6 +76,8 @@ class MainActivity : ComponentActivity() {
 
             var isDarkTheme by remember { mutableStateOf(false) }
             var isAlienLang by remember { mutableStateOf(false) }
+            val customFont =
+                if (isAlienLang) FontFamily(Font(R.font.allymade)) else FontFamily.Default
 
             LaunchedEffect(Unit) {
                 isDarkTheme = themePreferences.isDarkThemeEnabled()
@@ -106,10 +112,7 @@ class MainActivity : ComponentActivity() {
                                     verticalArrangement = Arrangement.Center,
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    Text(
-                                        currentTitle,
-                                        fontFamily = if (isAlienLang) FontFamily(Font(R.font.allymade)) else FontFamily.Default
-                                    )
+                                    Text(currentTitle, fontFamily = customFont)
                                 }
                             }
                         }
@@ -125,16 +128,28 @@ class MainActivity : ComponentActivity() {
                             languagePreferences,
                             isAlienLang,
                             { isAlienLang = it },
-                            if (isAlienLang) FontFamily(Font(R.font.allymade)) else FontFamily.Default
+                            customFont
                         )
 
                         Screen.HOME -> Home(
                             modifier = Modifier.padding(innerPadding),
-                            if (isAlienLang) FontFamily(Font(R.font.allymade)) else FontFamily.Default,
+                            customFont,
                             isLoading,
                             errorMessage,
-                            newsResponse
+                            newsResponse,
+                            { article ->
+                                selectedArticle = article
+                                currentScreen = Screen.FULL_ITEM
+                            }
                         )
+
+                        Screen.FULL_ITEM -> selectedArticle?.let {
+                            FullItem(
+                                Modifier.padding(innerPadding),
+                                customFont,
+                                it
+                            )
+                        }
                     }
                     Column(
                         Modifier
@@ -152,6 +167,13 @@ class MainActivity : ComponentActivity() {
                                         Icons.Default.Home,
                                         "Home",
                                         tint = if (currentScreen == Screen.HOME) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.onPrimary
+                                    )
+                                }
+                                IconButton(onClick = { /*currentScreen = Screen.RECENTS*/ }) {
+                                    Icon(
+                                        Icons.Default.DateRange,
+                                        "Recent",
+                                        tint = if (/*currentScreen == Screen.RECENTS */ false) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.onPrimary
                                     )
                                 }
                                 IconButton(onClick = { currentScreen = Screen.SETTINGS }) {
