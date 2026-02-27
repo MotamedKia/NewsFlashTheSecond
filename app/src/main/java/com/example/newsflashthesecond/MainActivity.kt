@@ -58,6 +58,7 @@ class MainActivity : ComponentActivity() {
             val context = LocalContext.current
 
             var isLoading by remember { mutableStateOf(false) }
+            var hasTopAppBar by remember { mutableStateOf(false) }
             var errorMessage by remember { mutableStateOf<String?>(null) }
             var newsResponse by remember { mutableStateOf<List<Article>>(emptyList()) }
 
@@ -96,59 +97,73 @@ class MainActivity : ComponentActivity() {
 
             NewsFlashTheSecondTheme(darkTheme = isDarkTheme) {
                 Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
-                    TopAppBar(title = {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(end = 16.dp),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Card(
-                                modifier = Modifier.fillMaxWidth()
+                    if (hasTopAppBar) {
+                        TopAppBar(title = {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(end = 16.dp),
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Column(
-                                    Modifier.fillMaxWidth(),
-                                    verticalArrangement = Arrangement.Center,
-                                    horizontalAlignment = Alignment.CenterHorizontally
+                                Card(
+                                    modifier = Modifier.fillMaxWidth()
                                 ) {
-                                    Text(currentTitle, fontFamily = customFont)
+                                    Column(
+                                        Modifier.fillMaxWidth(),
+                                        verticalArrangement = Arrangement.Center,
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Text(currentTitle, fontFamily = customFont)
+                                    }
                                 }
                             }
-                        }
-                    })
+                        })
+                    }
                 }) { innerPadding ->
                     when (currentScreen) {
-                        Screen.SETTINGS -> Settings(
-                            Modifier.padding(innerPadding),
-                            coroutineScope,
-                            isDarkTheme,
-                            themePreferences,
-                            { isDarkTheme = it },
-                            languagePreferences,
-                            isAlienLang,
-                            { isAlienLang = it },
-                            customFont
-                        )
-
-                        Screen.HOME -> Home(
-                            modifier = Modifier.padding(innerPadding),
-                            customFont,
-                            isLoading,
-                            errorMessage,
-                            newsResponse,
-                            { article ->
-                                selectedArticle = article
-                                currentScreen = Screen.FULL_ITEM
-                            }
-                        )
-
-                        Screen.FULL_ITEM -> selectedArticle?.let {
-                            FullItem(
+                        Screen.SETTINGS -> {
+                            hasTopAppBar = true
+                            Settings(
                                 Modifier.padding(innerPadding),
-                                customFont,
-                                it
+                                coroutineScope,
+                                isDarkTheme,
+                                themePreferences,
+                                { isDarkTheme = it },
+                                languagePreferences,
+                                isAlienLang,
+                                { isAlienLang = it },
+                                customFont
                             )
+                        }
+
+                        Screen.HOME -> {
+                            hasTopAppBar = true
+                            Home(
+                                modifier = Modifier.padding(innerPadding),
+                                customFont,
+                                isLoading,
+                                errorMessage,
+                                newsResponse,
+                                { article ->
+                                    selectedArticle = article
+                                    currentScreen = Screen.FULL_ITEM
+                                }
+                            )
+                        }
+
+                        Screen.FULL_ITEM -> {
+                            selectedArticle?.let {
+                                FullItem(
+                                    Modifier.padding(innerPadding),
+                                    customFont,
+                                    it,
+                                    {},
+                                    {},
+                                    {}
+                                )
+                                hasTopAppBar = false
+                            }
                         }
                     }
                     Column(
